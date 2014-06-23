@@ -1,16 +1,46 @@
 (ns pairwell.client.main
-  (:require [om.core :as om :include-macros true]
+  (:require [pairwell.client.communication :as comm]
+            [om.core :as om :include-macros true]
             [sablono.core :as html :refer-macros [html]]))
 
 
 (def app-state
-  (atom {:heading "Pair Well"}))
+  (atom {:heading "Pair Well"
+         :model {}}))
+
+(add-watch comm/chsk-state :a-state-change
+           (fn [k r old-val new-val]
+             (.log js/console "changed" (:open? new-val))
+             (swap! app-state assoc :open? (:open? new-val))))
+
+(add-watch comm/model :a-model-change
+           (fn [k r old-val new-val]
+             (.log js/console "changed model" new-val)
+             (swap! app-state assoc :model new-val)))
 
 (defn matching
   []
   [:div
    [:span (@app-state :error)]
-   [:h2 "You made it!"]])
+   [:h2 "You made it!"]
+   [:button.btn "+"]
+   [:textarea {:on-changeo (fn [e]
+                             (let [v (.-value (.-target e))]
+                               (comm/send)))}]
+   [:hr]
+   (for [card (get-in @app-state [:model :my-cards])]
+     (for [[k v] card]
+       [:dl.btn [:dt (name k)] [:dd v]]))
+   [:hr]
+   (for [invite (get-in @app-state [:model :invitations :received])]
+     (for [[k v] card]
+       [:dl.btn [:dt (name k)] [:dd v]]))
+   [:hr]
+   (for [invite (get-in @app-state [:model :invitations :sent])]
+     (for [[k v] card]
+       [:dl.btn [:dt (name k)] [:dd v]]))
+   [:hr]
+   [:span (str (@app-state :model))]])
 
 (defn welcome
   []
@@ -23,12 +53,15 @@
                              (swap! app-state dissoc :username))))}]
    [:br]
    [:span (@app-state :error)]
+   [:span (str (@app-state :open?))]
    [:br]
    [:button {:type "button"
-             :className "btn btn-primary btn-lg btn-block"
+             :class-name "btn btn-primary btn-lg btn-block"
              :on-click (fn [e]
+                         (comm/send)
                          (if (@app-state :username)
-                           (swap! app-state assoc :page matching)
+                           (do (comm/login (:username @app-state))
+                               (swap! app-state assoc :page matching))
                            (swap! app-state assoc :error "Please enter your name first.")))}
     "Start"]
    [:br]

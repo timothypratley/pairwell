@@ -17,6 +17,18 @@
   (println "Login request: " params)
   {:status 200 :session (assoc session :uid user-id)})
 
+(defn view [uid]
+  {:my-cards [{:topic "anything"
+               :until "9pm"}]
+   :invitations {:sent [{:to "spammer1"}]
+                 :received [{:from "spammer2"}]}
+   :available [{:with "spammer1"
+                :topic "work"
+                :until "5pm"}
+               {:with "spammer2"
+                :topic "fun"
+                :until "7pm"}]})
+
 (defn- event-msg-handler
   [{:as ev-msg :keys [ring-req event ?reply-fn]} _]
   (let [session (:session ring-req)
@@ -25,22 +37,13 @@
 
     (println "Event:" ev)
     (match [id data]
-    :else
-    (do (println "Unmatched event:" ev)
-        (when-not (:dummy-reply-fn? (meta ?reply-fn))
-          (?reply-fn {:umatched-event-as-echoed-from-from-server ev}))))))
+           [:pairwell/hello x]
+           (chsk-send! uid [:pairwell/model (view uid)])
+
+           :else
+           (do (println "Unmatched event:" ev)
+               (when-not (:dummy-reply-fn? (meta ?reply-fn))
+                 (?reply-fn {:umatched-event-as-echoed-from-from-server ev}))))))
 
 (defonce chsk-router
   (sente/start-chsk-router-loop! event-msg-handler ch-chsk))
-
-(defonce broadcaster
-  (go-loop []
-    (<! (async/timeout 10000))
-    (println (format "Broadcasting server>user: %s" @connected-uids))
-    (doseq [uid (:any @connected-uids)]
-      (chsk-send! uid
-                  [:pairwell/model {:my-cards [{:topic "anything"
-                                                :until "9pm"}]
-                                    :invitations {:sent [{:to "spammer1"}]
-                                                  :received [{:from "spammer2"}]}}]))
-    (recur)))

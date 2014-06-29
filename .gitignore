@@ -1,6 +1,9 @@
 /target
 /classes
 /checkouts
+/out
+/resources/js/out
+/resources/js/pairwell.js
 pom.xml
 pom.xml.asc
 *.jar

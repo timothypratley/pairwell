@@ -51,5 +51,4 @@
                                        :csrf-token (:csrf-token @chsk-state)}}
                     (fn [ajax-resp]
                       (logf "Ajax login response: %s" ajax-resp)))
-
   (sente/chsk-reconnect! chsk))

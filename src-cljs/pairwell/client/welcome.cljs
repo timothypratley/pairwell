@@ -1,12 +1,13 @@
 (ns pairwell.client.welcome
   (:require [pairwell.client.communication :as comm]
-            [pairwell.client.bindom :as bindom]))
+            [pairwell.client.bindom :as bindom]
+            [taoensso.encore :refer [logf]]))
 
 
 (defn welcome
   "Returns the landing page."
   [app-state]
-  [:form {:roleName "form"}
+  [:form {:role "form"}
    [:input {:placeholder "Enter your name"
             :on-change (bindom/setter app-state [:username])}]
    [:br]
@@ -18,13 +19,8 @@
      :on-click (fn [e]
                  (if (@app-state :username)
                    (do (comm/login (:username @app-state))
-                       (swap! app-state assoc :page :matching))
+                       (swap! app-state assoc :page :matching)
+                       (comm/chsk-send! [:pairwell/hello]))
                    (swap! app-state assoc
                           :error "Please enter your name first.")))}
-    "Start"]
-   [:br]
-   [:input]
-   [:br]
-   [:select 
-    [:option "foo"]
-    [:option "bar"]]])
+    "Start"]])

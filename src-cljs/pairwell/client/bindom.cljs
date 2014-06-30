@@ -24,3 +24,21 @@
       (if (seq v)
         (swap! app-state assoc-in path v)
         (swap! app-state dissoc-in path)))))
+
+(defn form
+  "Creates an event handler that extracts form control values
+  and conjs them onto a queue in app-state located at path.
+  The handler swallows exceptions and returns false to prevent
+  a POST request occuring."
+  [app-state path]
+  (fn a-submit-handler [e]
+    (try
+      (let [form-controls-collection (.-elements (.-target e))
+            kvps (for [i (range (.-length form-controls-collection))
+                       :let [control (.item form-controls-collection i)]
+                       :when (not= "submit" (.-type control))]
+                   [(.-name control) (.-value control)])]
+        (swap! app-state update-in path (fnil conj []) kvps))
+      (catch :default ex
+        (logf (pr-str ex))))
+    false))

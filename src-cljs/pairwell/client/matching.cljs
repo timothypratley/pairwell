@@ -4,23 +4,31 @@
 
 (defn render-card [card]
   [:button.btn.btn-default.btn-block
-   (into [:dl.dl-horizontal]
-         (apply concat (for [[k v] card]
-                         [[:dt (name k)]
-                          [:dd {:style {:text-align "left"}} v]])))])
+   [:dl.dl-horizontal
+    ;TODO: forcat?
+    (apply concat (for [[k v] card]
+                    [[:dt (name k)]
+                     [:dd {:style {:text-align "left"}}
+                      (if (string? v)
+                        v
+                        (for [x v]
+                          [:span x]))]]))]])
 
 (defn new-card-form [app-state]
-  [:div
-   [:textarea {:on-change (bindom/setter app-state [:matching :new-card :text])}]
-   [:ul
-    (for [tag (get-in @app-state [:matching :tags])]
-      [:li.label.label-defaul tag])]
+  [:form {:role "form"
+          :on-submit (bindom/form app-state [:new-card])}
+   [:input {:name "topic"}]
+   [:input {:type "time"
+            :name "until"}]
+   #_[:select
+    [:option "foo"]
+    [:option "bar"]]
    [:button.btn.btn-primary
-    {:on-click (fn [e])}
+    {:type "submit"}
     "Publish" [:span.glyphicon.glyphicon-ok]]
-   [:button.btn
+   [:button.btn.btn-danger
     {:on-click (fn [e]
-                 (swap! app-state bindom/dissoc-in [:matching :new-card]))}
+                 (swap! app-state dissoc :creating-new-card))}
     [:span.glyphicon.glyphicon-remove]]])
 
 (defn matching
@@ -48,24 +56,17 @@
         :on-click (fn [e]
                     (swap! app-state assoc :page :welcome))}
        "Stop"]]]
-    
-    [:hr]
     [:h3 "My cards"]
     (for [card (get-in @app-state [:model :my-cards])]
       (render-card card))
-    (if (get-in @app-state [:matching :new-card])
+    (if (:creating-new-card @app-state)
       (new-card-form app-state)
-      [:button.btn {:on-click (fn [e]
-                                (swap! app-state assoc-in
-                                       [:matching :new-card] {}))}
-       "+"])
-    [:hr]
-    [:h3 "Invitations received"]
-    (for [invite (get-in @app-state [:model :invitations :received])]
-      (render-card invite))
-    [:hr]
-    [:h3 "Invitations sent"]
-    (for [invite (get-in @app-state [:model :invitations :sent])]
+      [:button.btn.btn-primary
+       {:on-click (fn [e]
+                    (swap! app-state assoc :creating-new-card true))}
+       [:span.glyphicon.glyphicon-plus]])
+    [:h3 "My interests"]
+    (for [invite (get-in @app-state [:model :interest])]
       (render-card invite))
     [:hr]
     [:span (str (@app-state :model))]]])

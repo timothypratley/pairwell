@@ -2,34 +2,39 @@
   (:require [pairwell.client.bindom :as bindom]))
 
 
-(defn render-card [card]
-  [:button.btn.btn-default.btn-block
+(defn render-value [v]
+  (if (string? v)
+    v
+    (for [x v]
+      [:button.btn.btn-default x])))
+
+(defn render-card [card action]
+  [:div.btn.btn-default.btn-block
+   action
    [:dl.dl-horizontal
-    ;TODO: forcat?
-    (apply concat (for [[k v] card]
-                    [[:dt (name k)]
-                     [:dd {:style {:text-align "left"}}
-                      (if (string? v)
-                        v
-                        (for [x v]
-                          [:span x]))]]))]])
+    (interleave
+     (for [k (keys card)]
+       [:dt (name k)])
+     (for [v (vals card)]
+       [:dd {:style {:text-align "left"}} (render-value v)]))]])
 
 (defn new-card-form [app-state]
   [:form {:role "form"
-          :on-submit (bindom/form app-state [:new-card])}
-   [:input {:name "topic"}]
-   [:input {:type "time"
-            :name "until"}]
-   #_[:select
-    [:option "foo"]
-    [:option "bar"]]
-   [:button.btn.btn-primary
-    {:type "submit"}
-    "Publish" [:span.glyphicon.glyphicon-ok]]
-   [:button.btn.btn-danger
+          :on-submit (bindom/form app-state [:my-cards])}
+   [:button.close
     {:on-click (fn [e]
-                 (swap! app-state dissoc :creating-new-card))}
-    [:span.glyphicon.glyphicon-remove]]])
+                 (swap! app-state dissoc :creating-new-card)
+                 false)}
+    [:span.glyphicon.glyphicon-remove]]
+   [:div.form-group
+    [:input.form-control {:name "topic"
+                          :placeholder "Enter topic"}]]
+   [:div.form-group
+    [:input {:type "time"
+             :name "until"}]]
+   [:button.btn.btn-primary {:type "submit"}
+    "Publish"
+    [:span.glyphicon.glyphicon-ok]]])
 
 (defn matching
   "Page for searching for a matching pair"
@@ -39,7 +44,13 @@
    [:div.col-md-6
     [:h3 "Available"]
     (for [card (get-in @app-state [:model :available])]
-      (render-card card))]
+      (render-card card [:button.btn.btn-success.pull-right
+                         {:on-click (fn [e]
+                                      (swap! app-state
+                                             update-in [:interest]
+                                             (fnil conj #{})
+                                             card))}
+                         "Join"]))]
    [:div.col-md-6
     [:div.row
      [:div.col-md-8
@@ -58,7 +69,13 @@
        "Stop"]]]
     [:h3 "My cards"]
     (for [card (get-in @app-state [:model :my-cards])]
-      (render-card card))
+      (render-card card
+                   [:button.close
+                    {:on-click (fn [e]
+                                 (swap! app-state
+                                        update-in [:my-cards]
+                                        disj card))}
+                    [:span.glyphicon.glyphicon-remove]]))
     (if (:creating-new-card @app-state)
       (new-card-form app-state)
       [:button.btn.btn-primary
@@ -66,7 +83,13 @@
                     (swap! app-state assoc :creating-new-card true))}
        [:span.glyphicon.glyphicon-plus]])
     [:h3 "My interests"]
-    (for [invite (get-in @app-state [:model :interest])]
-      (render-card invite))
+    (for [interest (get-in @app-state [:model :interest])]
+      (render-card interest
+                   [:button.close
+                    {:on-click (fn [e]
+                                 (swap! app-state
+                                        update-in [:interest]
+                                        disj interest))}
+                    [:span.glyphicon.glyphicon-remove]]))
     [:hr]
     [:span (str (@app-state :model))]]])

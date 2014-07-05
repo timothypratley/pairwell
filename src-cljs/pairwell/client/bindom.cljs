@@ -27,7 +27,7 @@
 
 (defn form
   "Creates an event handler that extracts form control values
-  and conjs them onto a queue in app-state located at path.
+  and conjs them onto a set in app-state located at path.
   The handler swallows exceptions and returns false to prevent
   a POST request occuring."
   [app-state path]
@@ -38,7 +38,7 @@
                        :let [control (.item form-controls-collection i)]
                        :when (not= "submit" (.-type control))]
                    [(.-name control) (.-value control)])]
-        (swap! app-state update-in path (fnil conj []) kvps))
+        (swap! app-state update-in path (fnil conj #{}) kvps))
       (catch :default ex
         (logf (pr-str ex))))
     false))

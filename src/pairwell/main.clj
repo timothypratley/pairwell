@@ -18,5 +18,7 @@
   (println "Server stopped.")
   (dissoc system :stop))
 
+(def system (new-system))
+
 (defn -main [& args]
-  (start (new-system)))
+  (alter-var-root #'system start))

@@ -1,5 +1,5 @@
 (ns pairwell.client.bindom
-  (:require [taoensso.encore :refer [logf]]))
+  (:require [taoensso.encore :refer [errorf]]))
 
 
 (defn dissoc-in
@@ -26,19 +26,23 @@
         (swap! app-state dissoc-in path)))))
 
 (defn form
-  "Creates an event handler that extracts form control values
-  and conjs them onto a set in app-state located at path.
+  "Creates an event handler that extracts form control names and values
+  as a map, and calls f on them.
   The handler swallows exceptions and returns false to prevent
   a POST request occuring."
-  [app-state path]
+  [f]
   (fn a-submit-handler [e]
     (try
-      (let [form-controls-collection (.-elements (.-target e))
+      (let [target (.-target e)
+            form-controls-collection (.-elements target)
             kvps (for [i (range (.-length form-controls-collection))
-                       :let [control (.item form-controls-collection i)]
-                       :when (not= "submit" (.-type control))]
-                   [(.-name control) (.-value control)])]
-        (swap! app-state update-in path (fnil conj #{}) kvps))
+                       :let [control (.item form-controls-collection i)
+                             k (.-name control)
+                             v (.-value control)]
+                       :when (seq k)]
+                   [(keyword k) v])]
+        (if (f (into {} kvps))
+          (.reset target)))
       (catch :default ex
-        (logf (pr-str ex))))
+        (errorf (str ex))))
     false))

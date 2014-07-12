@@ -92,7 +92,7 @@
                    [:button.close
                     {:on-click (fn [e]
                                  (swap! app-state update-in [:cards]
-                                        dissoc topic))}
+                                        dissoc (:topic card)))}
                     [:span.glyphicon.glyphicon-remove]]))
     (if (:creating-new-card @app-state)
       (new-card-form app-state)

@@ -22,5 +22,5 @@
 
 (defn -main [& [port]]
   (when port
-    (alter-var-root #'system assoc :port port))
+    (alter-var-root #'system assoc :port (Integer. port)))
   (alter-var-root #'system start))

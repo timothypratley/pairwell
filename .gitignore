@@ -2,8 +2,7 @@
 /classes
 /checkouts
 /out
-/resources/public/js/out
-/resources/public/js/pairwell.js
+/resources/public/js
 pom.xml
 pom.xml.asc
 *.jar

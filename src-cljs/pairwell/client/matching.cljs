@@ -1,5 +1,6 @@
 (ns pairwell.client.matching
-  (:require [pairwell.client.bindom :as bindom]
+  (:require [clojure.string :as string]
+            [pairwell.client.bindom :as bindom]
             [taoensso.encore :refer [logf]]))
 
 
@@ -18,7 +19,7 @@
    [:dl.dl-horizontal
     (interleave
      (for [k (keys card)]
-       [:dt (name k)])
+       [:dt (string/capitalize (name k))])
      (for [v (vals card)]
        [:dd {:style {:text-align "left"}}
         (render-value app-state v)]))]])
@@ -71,21 +72,6 @@
     (for [card (get-in @app-state [:model :available])]
       (render-card app-state card (join-or-leave app-state card)))]
    [:div.col-md-6
-    [:div.row
-     [:div.col-md-8
-      [:div.progress
-       [:div.progress-bar.progress-bar-striped.active
-        {:role "progressbar"
-         :aria-valuenow "100"
-         :aria-valuemin "0"
-         :aria-valuemax "100"
-         :style {:width "100%"}} "Matching"]]]
-     [:div.col-md-4
-      [:button.btn.btn-danger.btn-block
-       {:type "button"
-        :on-click (fn [e]
-                    (swap! app-state assoc :page :welcome))}
-       "Stop"]]]
     [:h3 "My cards"]
     (for [card (get-in @app-state [:model :cards])]
       (render-card app-state card
@@ -99,6 +85,4 @@
       [:button.btn.btn-primary
        {:on-click (fn [e]
                     (swap! app-state assoc :creating-new-card true))}
-       [:span.glyphicon.glyphicon-plus]])
-    [:hr]
-    [:span (str (@app-state :model))]]])
+       [:span.glyphicon.glyphicon-plus]])]])

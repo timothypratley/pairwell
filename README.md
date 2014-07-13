@@ -4,7 +4,7 @@ Matches people for pair programming.
 
 ## Usage
 
-lein run
+lein run -m pairwell.main
 
 ## License
 

@@ -68,10 +68,6 @@
   [:div
    [:span (@app-state :error)]
    [:div.col-md-6
-    [:h3 "Available"]
-    (for [card (get-in @app-state [:model :available])]
-      (render-card app-state card (join-or-leave app-state card)))]
-   [:div.col-md-6
     [:h3 "My cards"]
     (for [card (get-in @app-state [:model :cards])]
       (render-card app-state card
@@ -85,4 +81,8 @@
       [:button.btn.btn-primary
        {:on-click (fn [e]
                     (swap! app-state assoc :creating-new-card true))}
-       [:span.glyphicon.glyphicon-plus]])]])
+       [:span.glyphicon.glyphicon-plus]])]
+   [:div.col-md-6
+    [:h3 "Available"]
+    (for [card (get-in @app-state [:model :available])]
+      (render-card app-state card (join-or-leave app-state card)))]])

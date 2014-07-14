@@ -1,7 +1,8 @@
 (ns pairwell.client.main
   (:require [pairwell.client.communication :as comm]
-            [pairwell.client.welcome :refer [welcome]]
+            [pairwell.client.about :refer [about]]
             [pairwell.client.matching :refer [matching]]
+            [pairwell.client.welcome :refer [welcome]]
             [om.core :as om :include-macros true]
             [sablono.core :as html :refer-macros [html]]))
 
@@ -10,7 +11,8 @@
                       :model {}}))
 
 (def page-fns {:welcome welcome
-               :matching matching})
+               :matching matching
+               :about about})
 
 (add-watch comm/chsk-state :a-chsk-state-change
            (fn a-chsk-state-change-watch [k r old-val new-val]
@@ -33,7 +35,32 @@
     om/IRender
     (render [this]
       (html [:div {:className "container"}
-             [:h1 "Pair Well"]
+             [:nav.navbar.navbar-default {:role "navigation"}
+              [:div.container-fluid
+               [:div.navbar-header
+                [:button.navbar-toggle {:type "button"
+                                        :data-toggle "collapse"
+                                        :data-target "navbar-collapse"}
+                 [:span.sr-only "Toggle navigation"]
+                 [:span.icon-bar]
+                 [:span.icon-bar]
+                 [:span.icon-bar]]
+                [:a.navbar-brand {:href "#"}
+                 "Pair Well"]]
+               [:div.collapse.navbar-collapse {:id "navbar-collapse"}
+                [:ul.nav.navbar-nav
+                 [:li [:a {:href "#"
+                           :on-click (fn [e]
+                                       (swap! app-state assoc
+                                              :page :about))} "About"]]
+                 [:li [:a {:href "#"
+                           :on-click (fn [e]
+                                       (swap! app-state assoc
+                                              :page :welcome))} "Preferences"]]
+                 [:li [:a {:href "#"
+                           :on-click (fn [e]
+                                       (swap! app-state assoc
+                                              :page :matching))} "Matching"]]]]]]
              ((page-fns page) app-state)]))))
 
 (om/root widget

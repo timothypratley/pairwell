@@ -1,5 +1,6 @@
 (ns pairwell.services
   (:require [taoensso.sente :as sente]
+            [clojure.data :as data]
             [clojure.core.match :refer [match]]
             [clojure.core.async :as async :refer [go go-loop <! >! put! chan]]))
 
@@ -71,18 +72,27 @@
 (defn view
   "The model visible to me."
   [uid]
-  (println "Sending view for UID" uid)
   {:cards (cards uid)
    :available (available uid)})
+
+(defn notify-changes []
+  (doseq [uid (:any @connected-uids)
+          :let [v (view uid)
+                [only-in-old only-in-new] (data/diff (@user-views uid) v)]
+          ; TODO: port and use clj-diff/patch
+          :when (or only-in-old only-in-new)]
+    (dosync
+     (alter user-views assoc uid v))
+    (chsk-send! uid [:pairwell/model v])))
 
 (defn update
   "Make updates in response to my app-state changes."
   [uid app-state]
-  (when uid
-    (println "Update for" uid)
-    (dosync
-     (alter user-states assoc uid app-state))
-    (chsk-send! uid [:pairwell/model (view uid)])))
+  (dosync
+   (if app-state
+     (alter user-states assoc uid app-state)
+     (alter user-states dissoc uid)))
+  (notify-changes))
 
 (defn- event-msg-handler
   [{:as ev-msg :keys [ring-req event ?reply-fn]} _]
@@ -92,11 +102,20 @@
 
     (println "Event:" ev)
     (match [id data]
-           [:pairwell/hello x]
-           (chsk-send! uid [:pairwell/model (view uid)])
+           [:chsk/ws-ping _]
+           :ignore
+
+           [:pairwell/hello _]
+           (let [v (view uid)]
+             (dosync alter user-views assoc uid v)
+             (chsk-send! uid [:pairwell/model v]))
 
            [:pairwell/app-state app-state]
-           (update uid app-state)
+           (when uid
+             (update uid app-state))
+
+           [:chsk/uidport-close _]
+           (update uid nil)
 
            :else
            (do (println "Unmatched event:" ev)

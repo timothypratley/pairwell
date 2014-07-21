@@ -3,6 +3,8 @@
             [pairwell.client.about :refer [about]]
             [pairwell.client.matching :refer [matching]]
             [pairwell.client.welcome :refer [welcome]]
+            [pairwell.client.audio :as audio]
+            [clojure.string :as string]
             [om.core :as om :include-macros true]
             [sablono.core :as html :refer-macros [html]]))
 
@@ -24,11 +26,17 @@
 
 (add-watch app-state :a-state-change
            (fn a-state-change-watch [k r old-val new-val]
+             (audio/transitions old-val new-val)
              (let [old-val (dissoc old-val :model)
                    new-val (dissoc new-val :model)]
                (when (not= old-val new-val)
                  (comm/send-app-state new-val)))))
 
+(defn link [to]
+  [:li [:a {:href "#"
+            :on-click (fn [e]
+                        (swap! app-state assoc
+                               :page to))} (string/capitalize (name to))]])
 
 (defn widget [{:keys [page] :as data} owner]
   (reify
@@ -49,18 +57,17 @@
                  "Pair Well"]]
                [:div.collapse.navbar-collapse {:id "navbar-collapse"}
                 [:ul.nav.navbar-nav
-                 [:li [:a {:href "#"
-                           :on-click (fn [e]
-                                       (swap! app-state assoc
-                                              :page :about))} "About"]]
-                 [:li [:a {:href "#"
-                           :on-click (fn [e]
-                                       (swap! app-state assoc
-                                              :page :welcome))} "Preferences"]]
-                 [:li [:a {:href "#"
-                           :on-click (fn [e]
-                                       (swap! app-state assoc
-                                              :page :matching))} "Matching"]]]]]]
+                 (link :welcome)
+                 (link :matching)
+                 (link :about)]
+                [:ul.nav.navbar-nav.pull-right
+                 (when-let [username (:username @app-state)]
+                   [:button.btn.btn-default
+                    [:span.glyphicon.glyphicon-user]
+                    " " username])
+                 (if (:open? @app-state)
+                   [:span.glyphicon.glyphicon-link]
+                   [:span.glyphicon.glyphicon-exclamation-sign])]]]]
              ((page-fns page) app-state)]))))
 
 (om/root widget

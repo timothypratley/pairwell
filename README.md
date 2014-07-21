@@ -1,10 +1,19 @@
-# pairwell
+# Pair Well
 
 Matches people for pair programming.
 
-## Usage
+http://pairwell.heroku.com
 
-lein run -m pairwell.main
+Feature requests and problem reports welcome at
+https://github.com/timothypratley/pairwell/issues
+
+
+## Development
+
+Pairwell is written in Clojure. Install Leiningen then
+
+`lein run -m pairwell.main`
+
 
 ## License
 

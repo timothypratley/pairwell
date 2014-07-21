@@ -23,13 +23,17 @@
   :hooks [leiningen.cljsbuild]
   :profiles {:dev {:plugins [[lein-cljsbuild "1.0.3"]]}}
   :cljsbuild {:builds {:dev {:compiler {:output-to "resources/public/js/pairwell-dev.js"
-                                         :output-dir "resources/public/js/out"
-                                         :optimizations :none
-                                         :source-map true
-                                         :warnings true}}
-                       :prod {:compiler {:output-to "resources/public/js/pairwell.js"
-                                         :optimizations :advanced
-                                         :pretty-print false
-                                         :preamble ["react/react.min.js"]
-                                         :externs ["react/externs/react.js"]
-                                         :warnings true}}}})
+                                        :output-dir "resources/public/js/out"
+                                        :optimizations :none
+                                        :source-map true
+                                        :warnings true}}
+                       :release {:compiler {:output-to "resources/public/js/pairwell.js"
+                                            :optimizations :advanced
+                                            :pretty-print false
+                                            :preamble ["react/react.min.js"
+                                                       "howler.js"]
+                                            :externs ["react/externs/react.js"
+                                                      "resources/howler.js"]
+                                            :warnings true
+                                            :closure-warnings {:externs-validation :off
+                                                               :non-standard-jsdoc :off}}}}})

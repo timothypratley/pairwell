@@ -1,6 +1,6 @@
 (ns pairwell.client.matching
-  (:require [clojure.string :as string]
-            [pairwell.client.bindom :as bindom]
+  (:require [pairwell.client.bindom :as bindom]
+            [clojure.string :as string]
             [taoensso.encore :refer [logf]]))
 
 
@@ -11,7 +11,9 @@
       [:button.btn.btn-default
        {:type "button"
         :on-click (fn [e]
-                    (swap! app-state assoc :confirmed x))} x])))
+                    (swap! app-state assoc :confirmed x))} x
+       " "
+       [:span.glyphicon.glyphicon-thumbs-up]])))
 
 (defn render-card [app-state card action]
   [:div.btn.btn-default.btn-block
@@ -45,7 +47,7 @@
     [:input {:name "until"
              :type "time"}]]
    [:button.btn.btn-primary {:type "submit"}
-    "Publish"
+    "Publish "
     [:span.glyphicon.glyphicon-ok]]])
 
 (defn join-or-leave [app-state card]

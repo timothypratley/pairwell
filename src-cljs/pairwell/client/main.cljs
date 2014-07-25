@@ -9,13 +9,21 @@
             [sablono.core :as html :refer-macros [html]]))
 
 
-(def app-state (atom {:page :welcome
+(def app-state (atom {:page :matching
                       :model {}}))
 
 (def page-fns {:welcome welcome
                :matching matching
                :about about})
 
+(defn maybe-login [{:keys [username interest cards page]}]
+  (when (and (not= :welcome page)
+             (empty? username)
+             (or interest cards))
+    (swap! app-state assoc :page :welcome)))
+
+;; TODO: should open explicitly instead of by require
+(swap! app-state assoc :open? (:open? @comm/chsk-state))
 (add-watch comm/chsk-state :a-chsk-state-change
            (fn a-chsk-state-change-watch [k r old-val new-val]
              (swap! app-state assoc :open? (:open? new-val))))
@@ -26,6 +34,7 @@
 
 (add-watch app-state :a-state-change
            (fn a-state-change-watch [k r old-val new-val]
+             (maybe-login new-val)
              (audio/transitions old-val new-val)
              (let [old-val (dissoc old-val :model)
                    new-val (dissoc new-val :model)]
@@ -66,8 +75,10 @@
                     [:span.glyphicon.glyphicon-user]
                     " " username])
                  (if (:open? @app-state)
-                   [:span.glyphicon.glyphicon-link]
-                   [:span.glyphicon.glyphicon-exclamation-sign])]]]]
+                   [:span.glyphicon.glyphicon-link
+                    {:title "Connected to server."}]
+                   [:span.glyphicon.glyphicon-exclamation-sign
+                    {:title "Disconnected from server."}])]]]]
              ((page-fns page) app-state)]))))
 
 (om/root widget

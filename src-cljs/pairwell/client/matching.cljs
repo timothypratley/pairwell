@@ -16,7 +16,10 @@
        [:span.glyphicon.glyphicon-thumbs-up]])))
 
 (defn render-card [app-state card action]
-  [:div.btn.btn-default.btn-block
+  [:div.btn.btn-block
+   {:class (cond (:contact card) "bg-success"
+                 (seq (:interest card)) "bg-warning"
+                 :else "btn-default")}
    action
    [:dl.dl-horizontal
     (interleave

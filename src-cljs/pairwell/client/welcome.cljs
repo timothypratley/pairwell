@@ -7,25 +7,22 @@
 (defn welcome
   "Returns the landing page."
   [app-state]
-  [:form {:role "form"
-          :on-submit (bindom/form
-                      (fn [{:keys [username contact]}]
-                        (cond
-                         (nil? username)
-                         (swap! app-state assoc
-                                :error "Please enter your name first.")
-
-                         (nil? contact)
-                         (swap! app-state assoc
-                                :error "Please enter contact preference.")
-
-                         :else
-                         (do (comm/login username)
-                             (swap! app-state assoc
-                                    :page :matching
-                                    :username username
-                                    :contact contact)
-                             (comm/chsk-send! [:pairwell/hello])))))}
+  [:form
+   {:role "form"
+    :on-submit (bindom/form
+                (fn [{:keys [username contact]}]
+                  (if-let [error (cond
+                                  (empty? username)
+                                  "Please enter your name."
+                                  (empty? contact)
+                                  "Please enter contact preference.")]
+                    (swap! app-state assoc :error error)
+                    (do (comm/login username)
+                        (swap! app-state assoc
+                               :page :matching
+                               :username username
+                               :contact contact)
+                        (comm/chsk-send! [:pairwell/hello])))))}
    [:div.form-group
     [:label.control-label {:for "username"} "Display name"]
     [:div.input-group.input-group-lg
@@ -46,5 +43,5 @@
      "Pair Well does not track or store your contact information, "
      "but will reveal it to people you confirm."]]
    (when-let [e (@app-state :error)]
-     [:p [:span.glyphicon.glyphicon-exclamation-sign] e])
+     [:p [:span.glyphicon.glyphicon-exclamation-sign] " " e])
    [:button.btn.btn-primary.btn-lg.btn-block {:type "submit"} "Start"]])

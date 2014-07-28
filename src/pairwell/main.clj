@@ -3,24 +3,22 @@
             [org.httpkit.server :refer [run-server]]))
 
 
-(defn new-system [port]
-  {:port port})
+(defonce system nil)
 
-(defn start [system]
-  {:pre [(not (system :stop))]}
-  (let [server (run-server #'handler system)]
-    (println "Server started.")
-    (assoc system :stop server)))
+(defn start [port]
+  {:pre [(not (:stop system))]}
+  (alter-var-root #'system assoc 
+                  :port port
+                  :stop (run-server #'handler {:port port}))
+  (println "Server started."))
 
-(defn stop [{:keys [stop] :as system}]
-  {:pre [stop]}
-  (stop)
+(defn stop []
+  {:pre [(:stop system)]}
+  ((:stop system)stop)
   (println "Server stopped.")
-  (dissoc system :stop))
-
-(def system (new-system 8080))
+  (alter-var-root #'system dissoc :stop))
 
 (defn -main [& [port]]
-  (when port
-    (alter-var-root #'system assoc :port (Integer. port)))
-  (alter-var-root #'system start))
+  (start (if port
+           (Integer. port)
+           8080)))

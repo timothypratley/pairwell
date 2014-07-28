@@ -14,10 +14,10 @@
                  [http-kit "2.1.18"]
                  [org.clojure/core.async "0.1.303.0-886421-alpha"]
                  [org.clojure/core.match "0.2.1"]
-                 [org.clojure/clojurescript "0.0-2268"]
-                 [com.taoensso/sente "0.15.0"]
+                 [org.clojure/clojurescript "0.0-2277"]
+                 [com.taoensso/sente "0.15.1"]
                  [com.taoensso/encore "1.7.0"]
-                 [com.facebook/react "0.9.0.2"]
+                 [com.facebook/react "0.11.1"]
                  [om "0.6.5"]
                  [sablono "0.2.18"]]
   :hooks [leiningen.cljsbuild]
@@ -30,10 +30,16 @@
                        :release {:compiler {:output-to "resources/public/js/pairwell.js"
                                             :optimizations :advanced
                                             :pretty-print false
-                                            :preamble ["react/react.min.js"
+                                            :preamble ["ga.js"
+                                                       "react/react.min.js"
+                                                       "jquery.js"
+                                                       "bootstrap.js"
                                                        "howler.js"]
-                                            :externs ["react/externs/react.js"
-                                                      "resources/howler.js"]
+                                            :externs ["ga.js"
+                                                      "react/externs/react.js"
+                                                      "jquery.js"
+                                                      "bootstrap.js"
+                                                      "howler.js"]
                                             :warnings true
                                             :closure-warnings {:externs-validation :off
                                                                :non-standard-jsdoc :off}}}}})

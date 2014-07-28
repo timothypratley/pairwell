@@ -2,27 +2,36 @@
 
 (defn about
   [app-state]
-  [:div
-   [:div.col-md-6
-    [:p "Pair Well matches people who are interested in collaborating right now."]
-    [:dl.dl-horizontal
-     [:dt "What?"]
-     [:dd "Meet up with people online who are interested in pair programming on a project right now."]
-     [:dt "Why?"]
-     [:dd "Pairing is fun and productive, coordinating schedules is hard."]
-     [:dt "How?"]
-     [:dd "Once you find someone to pair with, use Zoom or Google Hangouts to talk, and VNC or TMUX to type."]]
-    [:p
-        "I wrote Pair Well to connect with existing and new friends to work on personal projects. "
-        "Please email me ("
-        [:a {:href "mailto:timothypratley@gmail.com"}
-         "timothypratley@gmail.com"]
-        ") any feedback you have."]
-    [:p "Music by " [:a {:href "http://milkytracker.org/?download"
-                         :target "_blank"}
-                     "raina."]]]
-   [:div.col-md-6
-    [:img.img-responsive.img-rounded
-     {:src "img/muppetspairprogramming.jpg"
-      :style {:width "100%"}
-      :alt "muppets pair programming"}]]])
+  [:div.jumbotron
+   [:div.row
+    [:div.col-md-6
+     [:p "Pair Well matches people who are interested in collaborating right now."]
+     [:dl.dl-horizontal
+      [:dt "What?"]
+      [:dd
+       "You register your interests and are matched with suitable collaborators. "
+       "When you confirm someone to pair with, your contact details are mutually shared. "
+       "You can then start a direct video feed and screenshare to work, study, play games, "
+       "or whatever you both were interested in pairing on."]
+      [:dt "Why?"]
+      [:dd
+       "Pairing is fun and productive. Coordinating schedules is hard. "
+       "Login and pair with people who are ready right now with a shared interest."]
+      [:dt "How?"]
+      [:dd
+       "Once you find someone to pair with, use Zoom or Google Hangouts to talk. "
+       "Use ScreenHero, VNC or TMUX to allow each other to type."]]
+     [:p
+      "Pair Well does not track or store your contact information, "
+      "but will reveal it to people you confirm."]
+     [:p
+      "I wrote Pair Well to connect with friends to work on personal projects. "
+      "Please email me feedback "
+      [:a {:href "mailto:timothypratley@gmail.com"} "timothypratley@gmail.com"]
+      " and make request features at "
+      [:a {:href "https://github.com/timothypratley/pairwell/issues"} "github."]]]
+    [:div.col-md-6
+     [:img.img-responsive.img-rounded
+      {:src "img/muppetspairprogramming.jpg"
+       :style {:width "100%"}
+       :alt "muppets pair programming"}]]]])

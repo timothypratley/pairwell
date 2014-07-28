@@ -48,24 +48,23 @@
           (removed [k]
             (> (count (a k)) (count (b k))))
           (interest [x]
-            (set (mapcat :interest (get-in x [:model :cards]))))
+            (set (mapcat :people (get-in x [:model :cards]))))
           (new-interest []
             (seq (clojure.set/difference (interest b) (interest a))))
           (lost-interest []
             (seq (clojure.set/difference (interest a) (interest b))))
           (confirmed []
-            (seq (mapcat :contact (get-in x [:model :available]))))]
-    (when (changed :page)
+            (seq (mapcat :contact (get-in x [:model :joined]))))]
+    #_(when (changed :page)
       (if (= :about (b :page))
         ((dj :slumberjack))
         (when (= :about (a :page))
           (fade-out))))
     (when (changed :username)
-      (if (b :username)
-        ((dj :e))
+      (when-not (b :username)
         ((dj :d))))
     (when (added :cards)
-      ((dj :d)))
+      ((dj :e)))
     (when (removed :cards)
       ((dj :a)))
     (when (new-interest)

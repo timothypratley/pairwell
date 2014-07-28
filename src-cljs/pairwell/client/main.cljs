@@ -1,5 +1,6 @@
 (ns pairwell.client.main
-  (:require [pairwell.client.communication :as comm]
+  (:require [pairwell.client.bindom :as bindom]
+            [pairwell.client.communication :as comm]
             [pairwell.client.about :refer [about]]
             [pairwell.client.matching :refer [matching]]
             [pairwell.client.welcome :refer [welcome]]
@@ -9,7 +10,7 @@
             [sablono.core :as html :refer-macros [html]]))
 
 
-(def app-state (atom {:page :matching
+(def app-state (atom {:page :welcome
                       :model {}}))
 
 (def page-fns {:welcome welcome
@@ -47,7 +48,7 @@
                         (swap! app-state assoc
                                :page to))} (string/capitalize (name to))]])
 
-(defn widget [{:keys [page] :as data} owner]
+(defn widget [{:keys [page username] :as data} owner]
   (reify
     om/IRender
     (render [this]
@@ -63,22 +64,46 @@
                  [:span.icon-bar]
                  [:span.icon-bar]]
                 [:a.navbar-brand {:href "#"}
-                 "Pair Well"]]
+                 [:img {:src "img/favicon.ico"}]]]
                [:div.collapse.navbar-collapse {:id "navbar-collapse"}
-                [:ul.nav.navbar-nav
-                 (link :welcome)
-                 (link :matching)
-                 (link :about)]
-                [:ul.nav.navbar-nav.pull-right
-                 (when-let [username (:username @app-state)]
-                   [:button.btn.btn-default
-                    [:span.glyphicon.glyphicon-user]
-                    " " username])
-                 (if (:open? @app-state)
-                   [:span.glyphicon.glyphicon-link
-                    {:title "Connected to server."}]
-                   [:span.glyphicon.glyphicon-exclamation-sign
-                    {:title "Disconnected from server."}])]]]]
+                [:ul.nav.navbar-nav.navbar-right
+                 (when-not (:open? @app-state)
+                   [:li
+                    [:p.navbar-text
+                     [:span.glyphicon.glyphicon-exclamation-sign]
+                     " Disconnected from server."]])
+                 (when (not= page :welcome)
+                   (link :welcome))
+                 (when (and username (not= page :matching))
+                   (link :matching))
+                 (when (not= page :about)
+                   (link :about))
+                 (when username
+                   [:li.dropdown
+                    [:a.dropdown-toggle {:href "#"
+                                         :data-toggle "dropdown"}
+                     [:span.glyphicon.glyphicon-user]
+                     (str " " username)
+                     [:span.caret]]
+                    [:ul.dropdown-menu {:role "menu"}
+                     [:li
+                      [:form.form-inline
+                       {:role "form"
+                        :on-submit (bindom/form
+                                    (fn [{:keys [contact]}]
+                                      (swap! app-state assoc :contact contact)))}
+                       [:div.form-group
+                        [:div.input-group
+                         [:span.input-group-addon.glyphicon.glyphicon-facetime-video]
+                         [:input.form-control {:name "contact"
+                                               :placeholder "Contact me by"}]]]
+                       [:button.btn.btn-default.pull-right {:type "submit"}
+                        [:span.glyphicon.glyphicon-ok]]]]
+                     [:li [:a {:href "#"
+                               :on-click #(swap! app-state assoc
+                                                 :page :welcome
+                                                 :username nil)}
+                           "logout"]]]])]]]]
              ((page-fns page) app-state)]))))
 
 (om/root widget

@@ -25,9 +25,7 @@
          (reset! model m) 
 
          [:chsk/state {:first-open? true}]
-         (do
-           (logf "Channel socket successfully established!")
-           (chsk-send! [:pairwell/hello]))
+         (logf "Channel socket successfully established!")
 
          [:chsk/state new-state]
          (logf "Chsk state change: %s" new-state)

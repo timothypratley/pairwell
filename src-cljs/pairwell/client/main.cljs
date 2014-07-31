@@ -25,28 +25,31 @@
 
 ;; TODO: should open explicitly instead of by require
 (swap! app-state assoc :open? (:open? @comm/chsk-state))
-(add-watch comm/chsk-state :a-chsk-state-change
-           (fn a-chsk-state-change-watch [k r old-val new-val]
-             (swap! app-state assoc :open? (:open? new-val))))
+(defn chsk-state-change-watch
+  [k r a b]
+  (swap! app-state assoc :open? (:open? b)))
+(add-watch comm/chsk-state :csc chsk-state-change-watch)
 
-(add-watch comm/model :a-model-change
-           (fn a-model-change-watch [k r old-val new-val]
-             (swap! app-state assoc :model new-val)))
+(defn model-change-watch
+  [k r a b]
+  (swap! app-state assoc :model b))
+(add-watch comm/model :mc model-change-watch)
 
-(add-watch app-state :a-state-change
-           (fn a-state-change-watch [k r old-val new-val]
-             (maybe-login new-val)
-             (audio/transitions old-val new-val)
-             (let [old-val (dissoc old-val :model)
-                   new-val (dissoc new-val :model)]
-               (when (not= old-val new-val)
-                 (comm/send-app-state new-val)))))
+(defn state-change-watch
+  [k r a b]
+  (maybe-login b)
+  (audio/transitions a b)
+  (let [a (dissoc a :model)
+        b (dissoc b :model)]
+    (when (not= a b)
+      (comm/send-app-state b))))
+(add-watch app-state :sc state-change-watch)
 
 (defn link [to]
   [:li [:a {:href "#"
-            :on-click (fn [e]
-                        (swap! app-state assoc
-                               :page to))} (string/capitalize (name to))]])
+            :on-click (fn a-link-click [e]
+                        (swap! app-state assoc :page to))}
+        (string/capitalize (name to))]])
 
 (defn widget [{:keys [page username] :as data} owner]
   (reify

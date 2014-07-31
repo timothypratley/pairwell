@@ -14,22 +14,25 @@
   (into (empty m) (for [[k v] m]
                     [k (f v)])))
 
+(defn set-builder
+  [acc [k v]]
+  (update-in acc [k] conj-set v))
+
 (defn all-activities
   "Creates a map of activity to a set of users."
   [users]
   (let [activity-user (for [[username {:keys [activities]}] users
                             activity activities]
                         [activity username])]
-    (reduce (fn a-set-builder [acc [k v]]
-              (update-in acc [k] conj-set v))
-            {}
-            activity-user)))
+    (reduce set-builder {} activity-user)))
 
 (defn classify-activity
   "Splits activities into categories."
-  [me pair people]
+  [people-sets me pair people]
   (donc
    :paired (and (people me) pair (people pair))
+   :invited (and (people me) (some (:inviting people-sets) (disj people me)))
+   :shared (and (people me) (some (:available people-sets) (disj people me)))
    :joined (people me)
    :available :default))
 
@@ -51,18 +54,19 @@
   "A map of paired, joined, and available activities."
   [users uids activity->people me]
   (let [confirmed (get-in users [me :confirmed])
+        person_type (fn a-person-classifier [person]
+                      (classify-person users me confirmed person))
+        people-sets (modify-vals (group-by person_type uids) set)
         paired (and confirmed (= me (get-in users [confirmed :confirmed])))
-        cata (fn an-activity-classifier [[activity people]]
-               (classify-activity me (when paired confirmed) people))
-        categorized (group-by cata activity->people)
+        participation (fn an-activity-classifier [[activity people]]
+                        (classify-activity people-sets me (when paired confirmed) people))
+        categorized (group-by participation activity->people)
+        maps (modify-vals categorized #(into {} %))
         with-contact (if paired
-                       (assoc categorized
-                         :contact {confirmed (get-in users [confirmed :contact])})
-                       categorized)
-        catp (fn a-person-classifier [person]
-               (classify-person users me confirmed person))
-        people (modify-vals (group-by catp uids) set)]
-    (assoc with-contact :people people)))
+                       (assoc maps
+                         :contact {confirmed (get-in users [confirmed :contact-me])})
+                       maps)]
+    (assoc with-contact :people people-sets)))
 
 (defn states->views
   "Builds all user views out of all user states. Returns a map of user->view."

@@ -33,12 +33,13 @@
      (alter user-states dissoc uid))
    (ref-set user-views (views/states->views @user-states (:any @connected-uids)))))
 
-(add-watch user-views :a-user-views-watch
-           (fn a-user-views-watch [a b]
-             (let [[only-in-a only-in-b] (data/diff a b)]
-               (doseq [uid (set (concat (keys only-in-a) (keys only-in-b)))
-                       :when (contains? (:any @connected-uids) uid)]
-                 (chsk-send! uid [:pairwell/model (b uid)])))))
+(defn user-views-watch
+  [k r a b]
+  (let [[only-in-a only-in-b] (data/diff a b)]
+    (doseq [uid (set (concat (keys only-in-a) (keys only-in-b)))
+            :when ((:any @connected-uids) uid)]
+      (chsk-send! uid [:pairwell/model (b uid)]))))
+(add-watch user-views :uvw user-views-watch)
 
 
 (defn- event-msg-handler

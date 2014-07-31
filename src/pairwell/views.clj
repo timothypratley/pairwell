@@ -28,11 +28,11 @@
 
 (defn classify-activity
   "Splits activities into categories."
-  [people-sets me pair people]
+  [{:keys [inviting available]} me pair people]
   (donc
    :paired (and (people me) pair (people pair))
-   :invited (and (people me) (some (:inviting people-sets) (disj people me)))
-   :shared (and (people me) (some (:available people-sets) (disj people me)))
+   :invited (and (people me) inviting (some inviting (disj people me)))
+   :shared (and (people me) available (some available (disj people me)))
    :joined (people me)
    :available :default))
 
@@ -72,6 +72,7 @@
   "Builds all user views out of all user states. Returns a map of user->view."
   [users uids]
   (let [activity->people (all-activities users)
-        views (for [me (remove nil? uids)]
+        uids (remove nil? uids)
+        views (for [me uids]
                 [me (view users uids activity->people me)])]
     (into {} views)))

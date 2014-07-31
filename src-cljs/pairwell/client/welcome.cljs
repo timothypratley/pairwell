@@ -33,7 +33,7 @@
                                   :page :matching
                                   :username username
                                   :contact contact
-                                  :cards {card-title {}})
+                                  :activities #{card-title})
                            (comm/chsk-send! [:pairwell/hello])))))}
       [:div.form-group
        [:div.input-group.input-group-lg

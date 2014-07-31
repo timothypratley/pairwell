@@ -18,14 +18,11 @@
      "Join"]))
 
 (defn render-value [app-state v]
-  (if (string? v)
-    v
-    (for [x v]
-      [:button.btn.btn-default
-       {:type "button"
-        :on-click #(swap! app-state assoc :confirmed x)}
-       (str x " ")
-       [:span.glyphicon.glyphicon-thumbs-up]])))
+  [:button.btn.btn-default
+   {:type "button"
+    :on-click #(swap! app-state assoc :confirmed v)}
+   (str v " ")
+   [:span.glyphicon.glyphicon-thumbs-up]])
 
 (defn render-activity [app-state [activity people] participation]
   [:div.panel.panel-default
@@ -33,15 +30,12 @@
     {:class (case participation
               :paired "bg-success"
               :invited "bg-info"
-              :shared "bg-warning")}
+              :shared "bg-warning"
+              nil)}
     (join-or-leave app-state activity)
-    [:dl.dl-horizontal
-     (interleave
-      (for [k (keys activity)]
-        [:dt (string/capitalize (name k))])
-      (for [v (vals activity)]
-        [:dd {:style {:text-align "left"}}
-         (render-value app-state v)]))]]])
+    [:h4 activity]
+    (for [p people]
+      (render-value app-state p))]])
 
 (defn new-activity-form [app-state]
   [:div.panel.panel-default

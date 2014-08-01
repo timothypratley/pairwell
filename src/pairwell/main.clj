@@ -14,7 +14,7 @@
 
 (defn stop []
   {:pre [(:stop system)]}
-  ((:stop system)stop)
+  ((:stop system))
   (println "Server stopped.")
   (alter-var-root #'system dissoc :stop))
 

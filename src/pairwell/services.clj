@@ -2,6 +2,7 @@
   (:require [pairwell.views :as views]
             [taoensso.sente :as sente]
             [clojure.data :as data]
+            #_[clj-diff.core :as diff]
             [clojure.core.match :refer [match]]))
 
 
@@ -21,7 +22,7 @@
     (println "Login request: " params)
     {:status 200 :session (assoc session :uid user-id)}))
 
-(defonce user-states (ref {"Testbot" {:activities ["Test activity"]}}))
+(defonce user-states (ref {"Testbot" {:activities #{"Test activity"}}}))
 (defonce user-views (ref {}))
 
 (defn update
@@ -38,6 +39,11 @@
   (let [[only-in-a only-in-b] (data/diff a b)]
     (doseq [uid (set (concat (keys only-in-a) (keys only-in-b)))
             :when ((:any @connected-uids) uid)]
+      #_(let [patch (diff/diff (a uid) (b uid))]
+        (println "B" (b uid))
+        (println "P" patch)
+        (println "R" (apply hash-map (diff/patch a patch)))
+        (chsk-send! uid [:pairwell/patch patch]))
       (chsk-send! uid [:pairwell/model (b uid)]))))
 (add-watch user-views :uvw user-views-watch)
 

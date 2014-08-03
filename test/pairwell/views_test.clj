@@ -3,36 +3,37 @@
             [clojure.test :refer :all]))
 
 
+(def uids ["john" "jane" "tim" "bad"])
 (def users
   {"john" {:page :about
-           :activities ["Anything"]
+           :activities #{"Anything"}
            :confirmed "jane"}
-   "jane" {:contact-me "jane@example.com"
+   "jane" {:contact "jane@example.com"
            :page :matching
-           :activities ["Project Euler"
-                        "Improving Pair Well"]
+           :activities #{"Project Euler"
+                         "Improving Pair Well"}
            :confirmed "tim"}
-   "tim" {:contact-me "tim@example.com"
+   "tim" {:contact "tim@example.com"
           :page :matching
-          :activities ["Improving Pair Well"]
+          :activities #{"Improving Pair Well"}
           :confirmed "jane"}
-   "Testbot" {:activities ["Test activity"]}
+   "Testbot" {:activities #{"Test activity"}}
    "bad" {:yeargh nil}})
-(def uids ["john" "jane" "tim" "bad"])
 
-(deftest test-state->views
+(deftest test-states->views
   (testing "View constructors"
-    (let [activities (all-activities users)
-          my-view (view users uids activities "tim")]
+    (let [activity->people (participation users)
+          my-view (view users activity->people "tim")]
       (is (= {"Anything" #{"john"}
               "Project Euler" #{"jane"}
               "Improving Pair Well" #{"tim" "jane"}
               "Test activity" #{"Testbot"}}
-             activities))
-      (is (= {:available #{"john" "bad"}
+             activity->people))
+      (is (= {:available #{"john" "bad" "Testbot"}
               :my-pair #{"jane"}
               :me #{"tim"}}
              (:people my-view)))))
+
   (testing "All views"
     (let [views (states->views users uids)
           {:strs [john jane tim]} views]
@@ -41,16 +42,17 @@
                           "Test activity" #{"Testbot"}
                           "Improving Pair Well" #{"tim" "jane"}}
               :joined {"Anything" #{"john"}}}
-             (dissoc john :people)))
+             (:activities john)))
+      (is (not (:contact john)))
       (is (= {:paired {"Improving Pair Well" #{"tim" "jane"}}
-              :contact {"tim" "tim@example.com"}
               :available {"Anything" #{"john"}
                           "Test activity" #{"Testbot"}}
               :joined {"Project Euler" #{"jane"}}}
-             (dissoc jane :people)))
+             (:activities jane)))
+      (is (= (:contact jane) {"tim" "tim@example.com"}))
       (is (= {:paired {"Improving Pair Well" #{"jane" "tim"}}
-              :contact {"jane" "jane@example.com"}
               :available {"Anything" #{"john"}
                           "Project Euler" #{"jane"}
                           "Test activity" #{"Testbot"}}}
-             (dissoc tim :people))))))
+             (:activities tim)))
+      (is (= (:contact tim) {"jane" "jane@example.com"})))))

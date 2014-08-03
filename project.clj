@@ -15,6 +15,7 @@
                  [org.clojure/core.async "0.1.303.0-886421-alpha"]
                  [org.clojure/core.match "0.2.1"]
                  [org.clojure/clojurescript "0.0-2277"]
+                 #_[clj-diff "1.0.0-SNAPSHOT"]
                  [com.taoensso/sente "0.15.1"]
                  [com.taoensso/encore "1.7.0"]
                  [com.facebook/react "0.11.1"]
@@ -31,7 +32,7 @@
                                             :optimizations :advanced
                                             :pretty-print false
                                             :preamble ["ga.js"
-                                                       "react/react.min.js"
+                                                       "react/react.js"
                                                        "jquery.js"
                                                        "bootstrap.js"
                                                        "howler.js"]

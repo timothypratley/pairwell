@@ -1,5 +1,6 @@
 (ns pairwell.client.about)
 
+
 (defn about
   [app-state]
   [:div.jumbotron
@@ -25,10 +26,10 @@
       "Pair Well does not track or store your contact information, "
       "but will reveal it to people you confirm."]
      [:p
-      "I wrote Pair Well to connect with friends to work on personal projects. "
-      "Please email me feedback "
-      [:a {:href "mailto:timothypratley@gmail.com"} "timothypratley@gmail.com"]
-      " and make request features at "
+      "I wrote Pair Well to connect with friends to work on personal projects. "]
+     [:p "Please email me feedback "
+      [:a {:href "mailto:timothypratley@gmail.com"} "(timothypratley@gmail.com)"]
+      " or request features and fixes on "
       [:a {:href "https://github.com/timothypratley/pairwell/issues"} "github."]]]
     [:div.col-md-6
      [:img.img-responsive.img-rounded

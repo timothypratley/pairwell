@@ -5,6 +5,7 @@
   (:require
    [cljs.core.match]
    [cljs.core.async :as async :refer [<! >! put! chan]]
+   #_[clj-diff.core :as diff]
    [taoensso.encore :as encore :refer [logf]]
    [taoensso.sente :as sente :refer [cb-success?]]))
 
@@ -22,7 +23,17 @@
   (logf "Event: %s" ev)
   (match [id data]
          [:chsk/recv [:pairwell/model m]]
-         (reset! model m) 
+         (reset! model m)
+
+         [:chsk/recv [:pairwell/patch p]]
+         (do
+           (logf "PATCH: %s" p)
+           #_(logf "M: %s" (apply hash-map (diff/patch {} p)))
+           #_(swap! model
+                  (fn [m p]
+                    (apply hash-map (diff/patch m p)))
+                  p)
+           #_(swap! model diff/patch p))
 
          [:chsk/state {:first-open? true}]
          (logf "Channel socket successfully established!")

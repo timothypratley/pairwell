@@ -5,7 +5,7 @@
 
 
 (defn welcome
-  "Returns the landing page."
+  "Landing page introduction and login."
   [app-state]
   [:div.jumbotron
    [:div.row
@@ -37,26 +37,19 @@
                            (comm/chsk-send! [:pairwell/hello])))))}
       [:div.form-group
        [:div.input-group.input-group-lg
-        [:span.input-group-addon.glyphicon.glyphicon-user]
+        [:span.input-group-addon [:span.glyphicon.glyphicon-user]]
         [:input.form-control {:name "username"
-                              :placeholder "Enter your name"}]]]
+                              :placeholder "My name"}]]]
       [:div.form-group
        [:div.input-group.input-group-lg
-        [:span.input-group-addon.glyphicon.glyphicon-facetime-video]
+        [:span.input-group-addon [:span.glyphicon.glyphicon-facetime-video]]
         [:input.form-control {:name "contact"
                               :placeholder "Contact me by"}]]]
       [:div.form-group
        [:div.input-group.input-group-lg
-        [:span.input-group-addon.glyphicon.glyphicon-pencil]
+        [:span.input-group-addon [:span.glyphicon.glyphicon-pencil]]
         [:input.form-control {:name "card-title"
                               :placeholder "I want to"}]]]
       (when-let [e (@app-state :error)]
         [:p [:span.glyphicon.glyphicon-exclamation-sign] " " e])
-      [:button.btn.btn-primary.btn-lg.btn-block {:type "submit"} "Start"]]]]
-   [:br]
-   [:br]
-   [:br]
-   #_[:div.row
-    [:div.embed-responsive.embed-responsive-16by9
-     [:iframe.embed-responsive-item {:src "//www.youtube.com/embed/JKQZpVJQRT0"
-                                     :allow-full-screen "allowfullscreen"}]]]])
+      [:button.btn.btn-primary.btn-lg.btn-block {:type "submit"} "Start"]]]]])

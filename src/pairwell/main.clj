@@ -10,7 +10,7 @@
   (alter-var-root #'system assoc 
                   :port port
                   :stop (run-server #'handler {:port port}))
-  (println "Server started on port" port "."))
+  (println "Server started on port" port))
 
 (defn stop []
   {:pre [(:stop system)]}

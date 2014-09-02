@@ -20,5 +20,5 @@
   (-> #'pairwell-routes
       reload/wrap-reload
       #_(anti-forgery/wrap-anti-forgery
-       {:read-token (fn [req] (-> req :params :csrf-token))})
+         {:read-token (fn [req] (-> req :params :csrf-token))})
       handler/site))

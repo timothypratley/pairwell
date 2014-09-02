@@ -1,13 +1,11 @@
 (ns pairwell.client.communication
   (:require-macros
-   [cljs.core.match.macros :refer [match]]
-   [cljs.core.async.macros :as asyncm :refer [go go-loop]])
+   [cljs.core.match.macros :refer [match]])
   (:require
    [cljs.core.match]
-   [cljs.core.async :as async :refer [<! >! put! chan]]
    #_[clj-diff.core :as diff]
    [taoensso.encore :as encore :refer [logf]]
-   [taoensso.sente :as sente :refer [cb-success?]]))
+   [taoensso.sente :as sente]))
 
 
 (let [{:keys [chsk ch-recv send-fn state]}

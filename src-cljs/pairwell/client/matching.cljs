@@ -1,7 +1,9 @@
 (ns pairwell.client.matching
   (:require [pairwell.client.bindom :as bindom]
+            [pairwell.client.util :as util]
             [clojure.string :as string]
-            [taoensso.encore :refer [logf]]))
+            [taoensso.encore :refer [logf]]
+            [om.core :as om :include-macros true]))
 
 
 (def set-conj (fnil conj #{}))
@@ -43,9 +45,15 @@
                    "glyphicon-thumbs-down"
                    "glyphicon-thumbs-up")}]]))
    (when contact
-     [:a.btn.btn-success {:href contact
-                          :target "_blank"}
-      contact])])
+     [:div
+      (om/build util/g-hangout
+                {:id "g-hangout"
+                 :invites [{:id contact
+                            :invite_type "email"}]})
+      [:a.btn.btn-success
+       {:href contact
+        :target "_blank"}
+       contact]])])
 
 (defn render-activity
   [app-state [activity people] participation]

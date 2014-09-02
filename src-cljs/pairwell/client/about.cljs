@@ -23,8 +23,7 @@
        "Once you find someone to pair with, use Zoom or Google Hangouts to talk. "
        "Use ScreenHero, VNC or TMUX to allow each other to type."]]
      [:p
-      "Pair Well does not track or store your contact information, "
-      "but will reveal it to people you confirm."]
+      "Your contact information will be shown to people you confirm."]
      [:p
       "I wrote Pair Well to connect with friends to work on personal projects. "]
      [:p "Please email me feedback "

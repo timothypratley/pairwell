@@ -23,7 +23,7 @@
                  [sablono "0.2.18"]]
   :hooks [leiningen.cljsbuild]
   :profiles {:dev {:plugins [[lein-cljsbuild "1.0.3"]]}}
-  :cljsbuild {:builds {:dev {:compiler {:output-to "resources/public/js/pairwell-dev.js"
+  :cljsbuild {:builds {:dev {:compiler {:output-to "resources/public/js/pairwell_dev.js"
                                         :output-dir "resources/public/js/out"
                                         :optimizations :none
                                         :source-map true

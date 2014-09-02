@@ -5,6 +5,7 @@
             [pairwell.client.matching :refer [matching]]
             [pairwell.client.welcome :refer [welcome]]
             [pairwell.client.audio :as audio]
+            [pairwell.client.util :as util]
             [clojure.string :as string]
             [om.core :as om :include-macros true]
             [sablono.core :as html :refer-macros [html]]))
@@ -69,7 +70,7 @@
     om/IRender
     (render [this]
       (html
-       [:div {:className "container"}
+       [:div.container
         [:nav.navbar.navbar-default {:role "navigation"}
          [:div.container-fluid
           [:div.navbar-header

@@ -5,11 +5,10 @@
             #_[clj-diff.core :as diff]
             [clojure.core.match :refer [match]]))
 
-
 ;TODO: this can be evaluated on code reload :(
 (let [{:keys [ch-recv send-fn ajax-post-fn ajax-get-or-ws-handshake-fn
-              connected-uids]}
-      (sente/make-channel-socket! {})]
+             connected-uids]}
+     (sente/make-channel-socket! {})]
   (defonce ring-ajax-post ajax-post-fn)
   (defonce ring-ajax-get-or-ws-handshake ajax-get-or-ws-handshake-fn)
   (defonce ch-chsk ch-recv)
@@ -22,7 +21,9 @@
     (println "Login request: " params)
     {:status 200 :session (assoc session :uid user-id)}))
 
-(defonce user-states (ref {"Testbot" {:activities #{"Test activity"}}}))
+(defonce user-states (ref {"Testbot" {:activities #{"Test activity"}
+                                      :confirmed "tim"
+                                      :contact "testbot@pairwell.com"}}))
 (defonce user-views (ref {}))
 
 (defn update

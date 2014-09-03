@@ -6,21 +6,19 @@
   :min-lein-version "2.0.0"
   :uberjar-name "pairwell-standalone.jar"
   :dependencies [[org.clojure/clojure "1.6.0"]
-                 [ring "1.3.0"]
+                 [ring "1.3.1"]
                  [ring/ring-anti-forgery "1.0.0"]
                  [compojure "1.1.8"]
-                 [bidi "1.10.4"]
-                 [liberator "0.12.0"]
-                 [http-kit "2.1.18"]
+                 [http-kit "2.1.19"]
                  [org.clojure/core.async "0.1.303.0-886421-alpha"]
-                 [org.clojure/core.match "0.2.1"]
-                 [org.clojure/clojurescript "0.0-2277"]
+                 [org.clojure/core.match "0.2.2"]
+                 [org.clojure/clojurescript "0.0-2322"]
                  #_[clj-diff "1.0.0-SNAPSHOT"]
-                 [com.taoensso/sente "0.15.1"]
-                 [com.taoensso/encore "1.7.0"]
+                 [com.taoensso/sente "1.0.0" :exclusions [org.clojure/clojure]]
+                 [com.taoensso/encore "1.8.0" :exclusions [org.clojure/clojure]]
                  [com.facebook/react "0.11.1"]
-                 [om "0.6.5"]
-                 [sablono "0.2.18"]]
+                 [om "0.7.1"]
+                 [sablono "0.2.22"]]
   :hooks [leiningen.cljsbuild]
   :profiles {:dev {:plugins [[lein-cljsbuild "1.0.3"]]}}
   :cljsbuild {:builds {:dev {:compiler {:output-to "resources/public/js/pairwell_dev.js"
@@ -32,11 +30,13 @@
                                             :optimizations :advanced
                                             :pretty-print false
                                             :preamble ["ga.js"
+                                                       "platform.js"
                                                        "react/react.js"
                                                        "jquery.js"
                                                        "bootstrap.js"
                                                        "howler.js"]
                                             :externs ["ga.js"
+                                                      "platform.js"
                                                       "react/externs/react.js"
                                                       "jquery.js"
                                                       "bootstrap.js"
